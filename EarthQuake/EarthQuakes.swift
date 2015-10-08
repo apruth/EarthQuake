@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OHHTTPStubs
 
 /**
 * EarthQuakeManager class that will be responsible for retrieving and processing earthquake data.
@@ -35,6 +36,23 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     */
     func getEarthQuakeData(days: Int?, completion: ((success:Bool, earthQuakes: [EarthQuake], error:NSError?) -> ())?) {
 
+        //stub response if configuration is set to on
+        if let usesStubs = NSBundle.mainBundle().objectForInfoDictionaryKey("UsesStubs") as? Bool {
+            var earthQuakeStub: OHHTTPStubsDescriptor?
+            if usesStubs {
+                //set up stub to use
+                earthQuakeStub = OHHTTPStubs.stubRequestsPassingTest(
+                    {$0.URL!.absoluteString == self.quakeURL}
+                ) { _ in
+                    return OHHTTPStubsResponse(fileAtPath: OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)!, statusCode:200, headers:["Content-Type":"application/xml"])
+                }
+            } else {
+                if let earthQuakeStub = earthQuakeStub {
+                    OHHTTPStubs.removeStub(earthQuakeStub)
+                }
+            }
+        }
+        
         if let url = NSURL(string: quakeURL) {
             
             let request = NSURLRequest(URL: url) //request to earthquake data
