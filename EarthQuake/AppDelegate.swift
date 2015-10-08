@@ -7,33 +7,15 @@
 //
 
 import UIKit
-import OHHTTPStubs
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-       
-        //stub response if configuration is set to on
-        if let usesStubs = NSBundle.mainBundle().objectForInfoDictionaryKey("UsesStubs") as? Bool {
-            var earthQuakeStub: OHHTTPStubsDescriptor?
-            if usesStubs {
-                //set up stub to use
-                earthQuakeStub = OHHTTPStubs.stubRequestsPassingTest(
-                    {$0.URL!.absoluteString == EarthQuakeConstants.quakeURL}
-                    ) { _ in
-                        return OHHTTPStubsResponse(fileAtPath: OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)!, statusCode:200, headers:["Content-Type":"application/xml"])
-                }
-            } else {
-                if let earthQuakeStub = earthQuakeStub {
-                    OHHTTPStubs.removeStub(earthQuakeStub)
-                }
-            }
-        }
 
-        
+    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        // Override point for customization after application launch.
         return true
     }
 
