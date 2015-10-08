@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import OHHTTPStubs
 @testable import EarthQuake
 
 class EarthQuakeTests: XCTestCase {
@@ -17,8 +18,10 @@ class EarthQuakeTests: XCTestCase {
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
+        
+        //remove all stubs on tear down
+        OHHTTPStubs.removeAllStubs()
     }
     
     func testExample() {
