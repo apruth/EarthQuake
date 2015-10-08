@@ -29,11 +29,12 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
         self.refreshControl.addTarget(self, action: "refreshTable:", forControlEvents: UIControlEvents.ValueChanged)
         self.earthQuakeTable.addSubview(self.refreshControl)
         
+        //show activity indicator until data is loaded
         self.activityIndicator.startAnimating()
         self.activityIndicator.hidden = false
         
         //load earth quake data
-        loadEarthQuakeData()
+        self.loadEarthQuakeData()
     }
     
     /**
@@ -96,7 +97,9 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
             }
         })
         alert.addAction(action)
-        self.presentViewController(alert, animated: true, completion: nil)
+        dispatch_async(dispatch_get_main_queue(),{() in
+            self.presentViewController(alert, animated: true, completion: nil)
+        })
     }
     
     /**)

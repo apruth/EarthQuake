@@ -10,7 +10,7 @@ import Foundation
 
 /**
 * EarthQuakeManager class that will be responsible for retrieving and processing earthquake data.
-* class is intended to be used as singleton
+* Intended to be used as singleton
 */
 class EarthQuakes: NSObject, NSXMLParserDelegate {
     
@@ -18,6 +18,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
 
     //singleton variable for EarthQuakeManager
     static let sharedInstance = EarthQuakes()
+    private override init() {}
 
     private var earthQuakes = [EarthQuake]() //earthquake data
     private var success = true //success of data retrieval
