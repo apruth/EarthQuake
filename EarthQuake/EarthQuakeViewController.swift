@@ -292,10 +292,15 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
                 
                 //see if last (sole) earthquake comprises a new section in and of itself
                 if let previousComponents = previousComponents {
-                    if (rowComponents.month != previousComponents.month || rowComponents.day != previousComponents.day) || currentSection == 0 {
+                    if (rowComponents.month != previousComponents.month || rowComponents.day != previousComponents.day) {
                         //need to add one because the last element is a new section
                         return currentSection + 1
                     }
+                }
+                
+                //for earth quake lists consisting of only one day
+                if currentSection == 0 {
+                    return currentSection + 1
                 }
             }
         }
