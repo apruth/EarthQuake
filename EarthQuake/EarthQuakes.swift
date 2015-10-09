@@ -34,7 +34,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     * @param completion - completion handler that will report back earthquake data
     *       success of call and possible error
     */
-    func getEarthQuakeData(days: Int?, completion: ((success:Bool, earthQuakes: [EarthQuake], error:NSError?) -> ())?) {
+    func getEarthQuakeData(days: Int?, completion: ((success:Bool, earthQuakes: [EarthQuake], error:NSError?) -> ())) {
 
         self.setupStubbing()
         
@@ -74,10 +74,8 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
                         //trim and sort list of earthquakes
                         strongSelf.trimEarthQuakesByDays(days)
                     }
-                    //call completion if not nil
-                    if let completion = completion {
-                        completion(success: strongSelf.success, earthQuakes: strongSelf.earthQuakes, error: strongSelf.error)
-                    }
+                    //call completion 
+                    completion(success: strongSelf.success, earthQuakes: strongSelf.earthQuakes, error: strongSelf.error)
                 }
             }).resume()
         }
@@ -91,7 +89,6 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     private func trimEarthQuakesByDays(days: Int?) {
         
         if let days = days {
-            
             //gets date given number of days before today and filters list based on it
             let compareDate = NSDate().dateByAddingTimeInterval(Double(60*60*24*(-days)))
             self.earthQuakes = self.earthQuakes.filter({$0.date?.compare(compareDate) == .OrderedDescending})
@@ -99,10 +96,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
         
         //sorts list of earthquakes
         self.earthQuakes.sortInPlace({
-            if let dayOne = $0.date, dayTwo = $1.date {
-                return dayOne.compare(dayTwo) == .OrderedDescending
-            }
-            return false
+            return $0.date?.compare($1.date!) == .OrderedDescending
         })
     }
     
