@@ -50,7 +50,6 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
             }
         })
     }
-
     
     /**
     * Loads earthquake data through EarthQuakes singleton and updates table view with data
@@ -298,7 +297,7 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
                     }
                 }
                 
-                //for earth quake lists consisting of only one day
+                //for earth quake lists consisting of only one day we still want a section
                 if currentSection == 0 {
                     return currentSection + 1
                 }

@@ -10,18 +10,18 @@ import Foundation
 import OHHTTPStubs
 
 /**
-* EarthQuakeManager class that will be responsible for retrieving and processing earthquake data.
+* EarthQuakes class that will be responsible for retrieving and processing earthquake data.
 * Intended to be used as singleton
 */
 class EarthQuakes: NSObject, NSXMLParserDelegate {
     
     static let quakeURL = "http://earthquake.usgs.gov/earthquakes/shakemap/rss.xml"
 
-    //singleton variable for EarthQuakeManager
+    //singleton variable for EarthQuakes
     static let sharedInstance = EarthQuakes()
     private override init() {}
 
-    private var earthQuakes = [EarthQuake]() //earthquake data
+    private var earthQuakes = [EarthQuake]() //earthquake data -- empty by default
     private var success = true //success of data retrieval
     private var error: NSError? //error that may have occurred
     private var earthQuake: EarthQuake? //earthquake that will be added to list
@@ -31,8 +31,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     * Gets earthquake data from RSS feed with completion.
     *
     * @param days - the number of days for which earthquake data should be retrieved
-    * @param completion - completion handler that will report back earthquake data
-    *       success of call and possible error
+    * @param completion - completion handler that will report back earthquake data success of call and possible error
     */
     func getEarthQuakeData(days: Int?, completion: ((success:Bool, earthQuakes: [EarthQuake], error:NSError?) -> ())) {
 
@@ -71,7 +70,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
                         }
                         
                         //trim and sort list of earthquakes
-                        strongSelf.trimEarthQuakesByDays(days)
+                        strongSelf.trimAndSortyEarthQuakes(days, order: .OrderedDescending)
                     }
                     //call completion 
                     completion(success: strongSelf.success, earthQuakes: strongSelf.earthQuakes, error: strongSelf.error)
@@ -81,11 +80,13 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     }
     
     /**
-    * Trims list of earthquakes that only reside within the given number of days from today and sorts them
+    * Function, with side effectes, trims instance list of earthquakes that only reside within the given number of days
+    * from today and sorts them in given order.
     * 
     * @param days - the number of days from today as optional
+    * @param order - the order in which to sort earth quake data
     */
-    private func trimEarthQuakesByDays(days: Int?) {
+    private func trimAndSortyEarthQuakes(days: Int?, order: NSComparisonResult) {
         
         if let days = days {
             //gets date given number of days before today and filters list based on it
@@ -95,7 +96,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
         
         //sorts list of earthquakes
         self.earthQuakes.sortInPlace({
-            return $0.date?.compare($1.date!) == .OrderedDescending
+            return $0.date?.compare($1.date!) == order
         })
     }
     
