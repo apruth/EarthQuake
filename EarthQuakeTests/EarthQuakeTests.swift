@@ -104,6 +104,40 @@ class EarthQuakeTests: XCTestCase {
             }
         }
     }
+
+    
+    /**
+    * Tests getting earth quake for EarthQuakes data against stubs with parse error.
+    */
+    func testGetEarthQuakeDataParseError() {
+        
+        //set up stub to use
+        stub(isHost(self.quakeURL), response: fixture("EarthQuakeStubInvalidXML.xml"))
+        
+        let trimEarthQuakeDays = 30
+        var asynchSuccess: Bool?
+        var asynchError: NSError?
+        var asynchEarthQuakes: [EarthQuake]?
+        
+        //get earth quake data
+        let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
+        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (success, earthQuakes, error) -> () in
+            
+            responseArrived.fulfill()
+            asynchSuccess = success
+            asynchError = error
+            asynchEarthQuakes = earthQuakes
+        }
+        
+        //wait for asynchronous call to complete before running assertions
+        self.waitForExpectationsWithTimeout(self.timeout) { _ -> Void in
+            
+            //test assertions
+            XCTAssertFalse(asynchSuccess!)
+            XCTAssertEqual(asynchError!.code, 73)
+            XCTAssertEqual(asynchEarthQuakes!.count, 0)
+        }
+    }
     
     /**
     * Tests getting earth quake data and errored status code.

@@ -18,7 +18,7 @@
 		8B2860C81BC59B13004AFD2E /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8B2860C41BC59B13004AFD2E /* LaunchScreen.xib */; settings = {ASSET_TAGS = (); }; };
 		8B2860C91BC59B13004AFD2E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B2860C61BC59B13004AFD2E /* Main.storyboard */; settings = {ASSET_TAGS = (); }; };
 		8B48FA471BC70FBC001E6790 /* EarthQuakeStubSuccess.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B80FF9F1BC6DC80007828CD /* EarthQuakeStubSuccess.xml */; settings = {ASSET_TAGS = (); }; };
-		8B80FFA01BC6E496007828CD /* EarthQuakeStubSuccess.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B80FF9F1BC6DC80007828CD /* EarthQuakeStubSuccess.xml */; settings = {ASSET_TAGS = (); }; };
+		8B48FA4E1BCC0566001E6790 /* EarthQuakeStubInvalidXML.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B48FA4C1BCC0533001E6790 /* EarthQuakeStubInvalidXML.xml */; settings = {ASSET_TAGS = (); }; };
 		F897D6195E9E29A415A62972 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD45400BF73D0354F46667DB /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -59,6 +59,7 @@
 		8B2860C51BC59B13004AFD2E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		8B2860C71BC59B13004AFD2E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8B48FA4A1BC833A0001E6790 /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = "Pods/../build/Debug-iphoneos/OHHTTPStubs.framework"; sourceTree = "<group>"; };
+		8B48FA4C1BCC0533001E6790 /* EarthQuakeStubInvalidXML.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = EarthQuakeStubInvalidXML.xml; sourceTree = "<group>"; };
 		8B80FF9F1BC6DC80007828CD /* EarthQuakeStubSuccess.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = EarthQuakeStubSuccess.xml; sourceTree = "<group>"; };
 		AD45400BF73D0354F46667DB /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -150,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				8B80FF9F1BC6DC80007828CD /* EarthQuakeStubSuccess.xml */,
+				8B48FA4C1BCC0533001E6790 /* EarthQuakeStubInvalidXML.xml */,
 			);
 			name = Stubs;
 			sourceTree = "<group>";
@@ -280,7 +282,6 @@
 			files = (
 				8B2860C81BC59B13004AFD2E /* LaunchScreen.xib in Resources */,
 				8B2860961BC599E0004AFD2E /* Assets.xcassets in Resources */,
-				8B80FFA01BC6E496007828CD /* EarthQuakeStubSuccess.xml in Resources */,
 				8B2860C91BC59B13004AFD2E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -289,6 +290,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B48FA4E1BCC0566001E6790 /* EarthQuakeStubInvalidXML.xml in Resources */,
 				8B48FA471BC70FBC001E6790 /* EarthQuakeStubSuccess.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

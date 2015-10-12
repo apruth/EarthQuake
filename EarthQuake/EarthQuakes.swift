@@ -24,7 +24,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     private var earthQuakes = [EarthQuake]() //earthquake data
     private var success = true //success of data retrieval
     private var error: NSError? //error that may have occurred
-    private var earthQuake:EarthQuake? //earthquake that will be added to list
+    private var earthQuake: EarthQuake? //earthquake that will be added to list
     private var elementName = "" //the current element being parsed
     
     /**
