@@ -36,8 +36,6 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     */
     func getEarthQuakeData(days: Int?, completion: ((success:Bool, earthQuakes: [EarthQuake], error:NSError?) -> ())) {
 
-        self.setupStubbing()
-        
         if let url = NSURL(string: quakeURL) {
             
             let request = NSURLRequest(URL: url) //request to earthquake data
@@ -45,6 +43,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
             
             //send request to get earthquake data asynchronously with completion
             session.dataTaskWithRequest(request, completionHandler: { [weak self] (data, response, error) -> Void in
+           
                 if let strongSelf = self {
                     
                     //check for error
@@ -188,26 +187,5 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
         
         self.success = false
         self.error = parseError
-    }
-    
-    /**
-    * Setup OHHTTPS stubbing if configuration is set to use it
-    */
-    private func setupStubbing() {
-        //stub response if configuration is set to on
-        if let usesStubs = NSBundle.mainBundle().objectForInfoDictionaryKey("UsesStubs") as? Bool {
-            var earthQuakeStub: OHHTTPStubsDescriptor?
-            if usesStubs {
-                //set up stub to use
-                earthQuakeStub = OHHTTPStubs.stubRequestsPassingTest({ $0.URL!.absoluteString == self.quakeURL })
-                    { _ in
-                        return OHHTTPStubsResponse(fileAtPath: OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)!, statusCode:200, headers:["Content-Type":"application/xml"])
-                    }
-            } else {
-                if let earthQuakeStub = earthQuakeStub {
-                    OHHTTPStubs.removeStub(earthQuakeStub)
-                }
-            }
-        }
     }
 }

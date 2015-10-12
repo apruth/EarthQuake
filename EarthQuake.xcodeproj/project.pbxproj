@@ -58,6 +58,7 @@
 		8B2860BF1BC59A3B004AFD2E /* EarthQuakeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EarthQuakeViewController.swift; sourceTree = "<group>"; };
 		8B2860C51BC59B13004AFD2E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		8B2860C71BC59B13004AFD2E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		8B48FA4A1BC833A0001E6790 /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = "Pods/../build/Debug-iphoneos/OHHTTPStubs.framework"; sourceTree = "<group>"; };
 		8B80FF9F1BC6DC80007828CD /* EarthQuakeStubSuccess.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = EarthQuakeStubSuccess.xml; sourceTree = "<group>"; };
 		AD45400BF73D0354F46667DB /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -156,6 +157,7 @@
 		992637F791CA9A3181720500 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8B48FA4A1BC833A0001E6790 /* OHHTTPStubs.framework */,
 				AD45400BF73D0354F46667DB /* Pods.framework */,
 			);
 			name = Frameworks;
@@ -521,6 +523,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos",
+				);
 				INFOPLIST_FILE = EarthQuakeTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.CapTech.EarthQuakeTests;
@@ -533,6 +539,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos",
+				);
 				INFOPLIST_FILE = EarthQuakeTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.CapTech.EarthQuakeTests;

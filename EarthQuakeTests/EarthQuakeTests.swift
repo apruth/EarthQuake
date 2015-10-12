@@ -13,6 +13,8 @@ import OHHTTPStubs
 class EarthQuakeTests: XCTestCase {
     
     let timeout = NSTimeInterval(3.0)
+    let quakeURL = "http://earthquake.usgs.gov/earthquakes/shakemap/rss.xml"
+
     
     /**
     * Sets up earth quake tests with stubs before each test is run
@@ -21,8 +23,7 @@ class EarthQuakeTests: XCTestCase {
         super.setUp()
 
         //set up stub to use
-        let quakeURL = "http://earthquake.usgs.gov/earthquakes/shakemap/rss.xml"
-        OHHTTPStubs.stubRequestsPassingTest({ $0.URL!.absoluteString == quakeURL }){ _ in
+        OHHTTPStubs.stubRequestsPassingTest({ $0.URL!.absoluteString == self.quakeURL }){ _ in
             return OHHTTPStubsResponse(fileAtPath: OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)!, statusCode:200, headers:["Content-Type":"application/xml"])
         }
     }
@@ -62,7 +63,7 @@ class EarthQuakeTests: XCTestCase {
         self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
             
             //test assertions
-            XCTAssertEqual(asynchSuccess, true)
+            XCTAssertTrue(asynchSuccess!)
             XCTAssertNil(asynchError)
             XCTAssertEqual(asynchEarthQuakes!.count, 11)
             
@@ -76,6 +77,40 @@ class EarthQuakeTests: XCTestCase {
     * Tests getting earth quake data and errored status code.
     */
     func testGetEarthQuakeDataError() {
+        
+        //set up stub to use
+        OHHTTPStubs.stubRequestsPassingTest({ $0.URL!.absoluteString == self.quakeURL }){ _ in
+            return OHHTTPStubsResponse(data: NSData(), statusCode:404, headers:["Content-Type":"application/xml"])
+        }
+        
+        let trimEarthQuakeDays = 30
+        var asynchSuccess: Bool?
+        var asynchError: NSError?
+        var asynchEarthQuakes: [EarthQuake]?
+        
+        //get earth quake data
+        let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
+        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (success, earthQuakes, error) -> () in
+            
+            responseArrived.fulfill()
+            asynchSuccess = success
+            asynchError = error
+            asynchEarthQuakes = earthQuakes
+        }
+        //wait for asynchronous call to complete before running assertions
+        self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
+            
+            //test assertions
+            XCTAssertFalse(asynchSuccess!)
+            XCTAssertNil(asynchError)
+            XCTAssertEqual(asynchEarthQuakes!.count, 0)
+        }
+    }
+    
+    /** 
+    * Tests getting earth quake data when network isnt available
+    */
+    func testGetEarthQuakeNetworkDown() {
         
     }
     
