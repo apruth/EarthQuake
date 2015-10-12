@@ -15,7 +15,7 @@ import OHHTTPStubs
 */
 class EarthQuakes: NSObject, NSXMLParserDelegate {
     
-    let quakeURL = "http://earthquake.usgs.gov/earthquakes/shakemap/rss.xml"
+    static let quakeURL = "http://earthquake.usgs.gov/earthquakes/shakemap/rss.xml"
 
     //singleton variable for EarthQuakeManager
     static let sharedInstance = EarthQuakes()
@@ -36,7 +36,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     */
     func getEarthQuakeData(days: Int?, completion: ((success:Bool, earthQuakes: [EarthQuake], error:NSError?) -> ())) {
 
-        if let url = NSURL(string: quakeURL) {
+        if let url = NSURL(string: EarthQuakes.quakeURL) {
             
             let request = NSURLRequest(URL: url) //request to earthquake data
             let session = NSURLSession.sharedSession()

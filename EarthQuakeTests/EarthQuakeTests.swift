@@ -13,7 +13,6 @@ import OHHTTPStubs
 class EarthQuakeTests: XCTestCase {
     
     let timeout = NSTimeInterval(3.0)
-    let quakeURL = "http://earthquake.usgs.gov/earthquakes/shakemap/rss.xml"
 
     override func setUp() {
         super.setUp()
@@ -35,7 +34,7 @@ class EarthQuakeTests: XCTestCase {
     func testGetEarthQuakeDataSuccessAt30() {
         
         //set up stub to use
-        stub(isHost(self.quakeURL), response: fixture("EarthQuakeStubSuccess.xml"))
+        stub(isHost(EarthQuakes.quakeURL), response: fixture("EarthQuakeStubSuccess.xml"))
         
         let trimEarthQuakeDays = 30
         let expectedEarthQuakes = buildEarthQuakeExpectedList()
@@ -73,7 +72,7 @@ class EarthQuakeTests: XCTestCase {
     func testGetEarthQuakeDataSuccessAt365() {
         
         //set up stub to use
-        stub(isHost(self.quakeURL), response: fixture("EarthQuakeStubSuccess.xml"))
+        stub(isHost(EarthQuakes.quakeURL), response: fixture("EarthQuakeStubSuccess.xml"))
 
         let trimEarthQuakeDays = 365
         let expectedEarthQuakes = self.buildEarthQuakeExpectedList()
@@ -112,7 +111,7 @@ class EarthQuakeTests: XCTestCase {
     func testGetEarthQuakeDataParseError() {
         
         //set up stub to use
-        stub(isHost(self.quakeURL), response: fixture("EarthQuakeStubInvalidXML.xml"))
+        stub(isHost(EarthQuakes.quakeURL), response: fixture("EarthQuakeStubInvalidXML.xml"))
         
         let trimEarthQuakeDays = 30
         var asynchSuccess: Bool?
@@ -145,7 +144,7 @@ class EarthQuakeTests: XCTestCase {
     func testGetEarthQuakeDataError() {
         
         //set up stub to use
-        stub(isHost(self.quakeURL), response: fixture(NSData(), status: 400))
+        stub(isHost(EarthQuakes.quakeURL), response: fixture(NSData(), status: 400))
         
         let trimEarthQuakeDays = 30
         var asynchSuccess: Bool?
@@ -178,7 +177,7 @@ class EarthQuakeTests: XCTestCase {
         
         let notConnectedError = NSError(domain:NSURLErrorDomain, code:Int(CFNetworkErrors.CFURLErrorNotConnectedToInternet.rawValue), userInfo:nil)
         //set up stub to use
-        stub(isHost(self.quakeURL), response: fixture(notConnectedError))
+        stub(isHost(EarthQuakes.quakeURL), response: fixture(notConnectedError))
         
         let trimEarthQuakeDays = 30
         var asynchSuccess: Bool?
