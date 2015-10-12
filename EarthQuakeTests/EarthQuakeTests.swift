@@ -15,17 +15,8 @@ class EarthQuakeTests: XCTestCase {
     let timeout = NSTimeInterval(3.0)
     let quakeURL = "http://earthquake.usgs.gov/earthquakes/shakemap/rss.xml"
 
-    
-    /**
-    * Sets up earth quake tests with stubs before each test is run
-    */
     override func setUp() {
         super.setUp()
-
-        //set up stub to use
-        OHHTTPStubs.stubRequestsPassingTest({ $0.URL!.absoluteString == self.quakeURL }){ _ in
-            return OHHTTPStubsResponse(fileAtPath: OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)!, statusCode:200, headers:["Content-Type":"application/xml"])
-        }
     }
     
     /**
@@ -39,9 +30,12 @@ class EarthQuakeTests: XCTestCase {
     }
     
     /**
-    * Tests getting earth quake for EarthQuakes data against stubs.
+    * Tests getting earth quake for EarthQuakes data against stubs with 30 days of expected data.
     */
-    func testGetEarthQuakeDataSuccess() {
+    func testGetEarthQuakeDataSuccessAt30() {
+        
+        //set up stub to use
+        stub(isHost(self.quakeURL), response: fixture("EarthQuakeStubSuccess.xml"))
         
         let trimEarthQuakeDays = 30
         let expectedEarthQuakes = buildEarthQuakeExpectedList()
@@ -67,7 +61,45 @@ class EarthQuakeTests: XCTestCase {
             XCTAssertNil(asynchError)
             XCTAssertEqual(asynchEarthQuakes!.count, 11)
             
-            for x in 0..<expectedEarthQuakes.count {
+            for x in 0..<asynchEarthQuakes!.count {
+                XCTAssertEqual(expectedEarthQuakes[x], asynchEarthQuakes![x])
+            }
+        }
+    }
+    
+    /**
+    * Tests getting earth quake for EarthQuakes data against stubs with 365 days of expected data.
+    */
+    func testGetEarthQuakeDataSuccessAt365() {
+        
+        //set up stub to use
+        stub(isHost(self.quakeURL), response: fixture("EarthQuakeStubSuccess.xml"))
+
+        let trimEarthQuakeDays = 365
+        let expectedEarthQuakes = self.buildEarthQuakeExpectedList()
+        var asynchSuccess: Bool?
+        var asynchError: NSError?
+        var asynchEarthQuakes: [EarthQuake]?
+        
+        //get earth quake data
+        let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
+        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (success, earthQuakes, error) -> () in
+            
+            responseArrived.fulfill()
+            asynchSuccess = success
+            asynchError = error
+            asynchEarthQuakes = earthQuakes
+        }
+        
+        //wait for asynchronous call to complete before running assertions
+        self.waitForExpectationsWithTimeout(self.timeout) { _ -> Void in
+            
+            //test assertions
+            XCTAssertTrue(asynchSuccess!)
+            XCTAssertNil(asynchError)
+            XCTAssertEqual(asynchEarthQuakes!.count, 12)
+            
+            for x in 0..<asynchEarthQuakes!.count {
                 XCTAssertEqual(expectedEarthQuakes[x], asynchEarthQuakes![x])
             }
         }
@@ -79,9 +111,7 @@ class EarthQuakeTests: XCTestCase {
     func testGetEarthQuakeDataError() {
         
         //set up stub to use
-        OHHTTPStubs.stubRequestsPassingTest({ $0.URL!.absoluteString == self.quakeURL }){ _ in
-            return OHHTTPStubsResponse(data: NSData(), statusCode:404, headers:["Content-Type":"application/xml"])
-        }
+        stub(isHost(self.quakeURL), response: fixture(NSData(), status: 400))
         
         let trimEarthQuakeDays = 30
         var asynchSuccess: Bool?
@@ -112,8 +142,32 @@ class EarthQuakeTests: XCTestCase {
     */
     func testGetEarthQuakeNetworkDown() {
         
+        let notConnectedError = NSError(domain:NSURLErrorDomain, code:Int(CFNetworkErrors.CFURLErrorNotConnectedToInternet.rawValue), userInfo:nil)
+        //set up stub to use
+        stub(isHost(self.quakeURL), response: fixture(notConnectedError))
+        
+        let trimEarthQuakeDays = 30
+        var asynchSuccess: Bool?
+        var asynchError: NSError?
+        
+        //get earth quake data
+        let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
+        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (success, _, error) -> () in
+            
+            responseArrived.fulfill()
+            asynchSuccess = success
+            asynchError = error
+        }
+        //wait for asynchronous call to complete before running assertions
+        self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
+            
+            //test assertions
+            XCTAssertFalse(asynchSuccess!)
+            XCTAssertEqual(asynchError!.code, -1009)
+        }
     }
     
+    //performance test ... future use (additionally OHTTPS allows for setting request/response and download times)
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock {
@@ -139,6 +193,7 @@ class EarthQuakeTests: XCTestCase {
         earthQuakes.append(buildEarthQuake("36.7341", longitude: "-98.125", dateString: "Mon, 05 Oct 2015 08:53:28 +0000", title: "3.5 - OKLAHOMA", link: "http://earthquake.usgs.gov/eqcenter/shakemap/global/shake/10003kcc/", floorMagnitude: "3"))
         earthQuakes.append(buildEarthQuake("41.8654", longitude: "-119.599", dateString: "Mon, 05 Oct 2015 04:35:47 +0000", title: "3.25 - 23.1 miles NE of Vya,NV", link: "http://earthquake.usgs.gov/eqcenter/shakemap/nn/shake/00513400/", floorMagnitude: "3"))
         earthQuakes.append(buildEarthQuake("-16.2519", longitude: "-72.2256", dateString: "Sun, 04 Oct 2015 15:15:25 +0000", title: "5.6 - NEAR THE COAST OF SOUTHERN PERU", link: "http://earthquake.usgs.gov/eqcenter/shakemap/global/shake/10003k7q/", floorMagnitude: "5"))
+        earthQuakes.append(buildEarthQuake("41.8654", longitude: "-119.599", dateString: "Mon, 05 Apr 2015 04:35:47 +0000", title: "3.25 - 23.1 miles NE of Vya,NV", link: "http://earthquake.usgs.gov/eqcenter/shakemap/nn/shake/00513400/", floorMagnitude: "3"))
         
         return earthQuakes
     }
@@ -162,5 +217,41 @@ class EarthQuakeTests: XCTestCase {
         earthQuake.floorMagnitude = floorMagnitude
         
         return earthQuake
+    }
+    
+    /**
+    * Helper function which tests host URL request to see if it is contained in given host.
+    */
+    private func isHost(host: String) -> (NSURLRequest -> Bool) {
+        return { req in req.URL?.absoluteString == host }
+    }
+    
+    /**
+    * Helper function which returns stubbed response for given file
+    */
+    private func fixture(filename: String, status: Int32 = 200) -> (NSURLRequest -> OHHTTPStubsResponse) {
+        let filePath = OHPathForFile(filename, self.dynamicType)
+        return { _ in OHHTTPStubsResponse(fileAtPath: filePath!, statusCode: status, headers: ["Content-Type":"application/xml"]) }
+    }
+    
+    /**
+    * Helper function which returns stubbed response for given data
+    */
+    private func fixture(data: NSData, status: Int32 = 200) -> (NSURLRequest -> OHHTTPStubsResponse) {
+        return { _ in OHHTTPStubsResponse(data: data, statusCode: status, headers: ["Content-Type":"application/xml"]) }
+    }
+    
+    /**
+    * Helper function which returns stubbed response for given error
+    */
+    private func fixture(error: NSError) -> (NSURLRequest -> OHHTTPStubsResponse) {
+        return { _ in  return OHHTTPStubsResponse(error: error) }
+    }
+    
+    /**
+    * Helper function that takes a request and response and sets up stub.
+    */
+    private func stub(condition: NSURLRequest -> Bool, response: NSURLRequest -> OHHTTPStubsResponse) {
+        OHHTTPStubs.stubRequestsPassingTest({ condition($0) }, withStubResponse: response)
     }
 }
