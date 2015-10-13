@@ -9,8 +9,7 @@
 import UIKit
 
 /**
-* EarthQuakeViewController - View containing UI components that will display and interact with earthquake 
-* data and user.
+* EarthQuakeViewController - View containing UI components that will display and interact with earthquake data and user.
 */
 class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
