@@ -33,7 +33,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     * @param days - the number of days for which earthquake data should be retrieved
     * @param completion - completion handler that will report back earthquake data success of call and possible error
     */
-    func getEarthQuakeData(days: Int?, completion: ((success:Bool, earthQuakes: [EarthQuake], error:NSError?) -> ())) {
+    func getEarthQuakeData(days: Int?, completion: ((success: Bool, earthQuakes: [EarthQuake], error: NSError?) -> ())) {
 
         if let url = NSURL(string: EarthQuakes.quakeURL) {
             
