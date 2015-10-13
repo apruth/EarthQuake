@@ -70,7 +70,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
                         }
                         
                         //trim and sort list of earthquakes
-                        strongSelf.trimAndSortyEarthQuakes(days, order: .OrderedDescending)
+                        strongSelf.trimAndSortEarthQuakes(days, order: .OrderedDescending)
                     }
                     //call completion 
                     completion(success: strongSelf.success, earthQuakes: strongSelf.earthQuakes, error: strongSelf.error)
@@ -86,7 +86,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     * @param days - the number of days from today as optional
     * @param order - the order in which to sort earth quake data
     */
-    private func trimAndSortyEarthQuakes(days: Int?, order: NSComparisonResult) {
+    private func trimAndSortEarthQuakes(days: Int?, order: NSComparisonResult) {
         
         if let days = days {
             //gets date given number of days before today and filters list based on it
