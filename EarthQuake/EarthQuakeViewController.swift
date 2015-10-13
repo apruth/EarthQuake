@@ -16,7 +16,7 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
 
     private let earthQuakeDays = 30
     private var earthQuakes: [EarthQuake]?
-    private var refreshControl:UIRefreshControl!
+    private var refreshControl: UIRefreshControl!
     
     @IBOutlet weak var earthQuakeTable: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -60,13 +60,13 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
             
             if let strongSelf = self {
                 
-                dispatch_async(dispatch_get_main_queue(),{() in
+                dispatch_async(dispatch_get_main_queue(),{ _ in
                     strongSelf.activityIndicator.stopAnimating()
                 })
                     
                 if success {
                     strongSelf.earthQuakes = earthQuakes
-                    dispatch_async(dispatch_get_main_queue(),{() in
+                    dispatch_async(dispatch_get_main_queue(),{ _ in
                         strongSelf.earthQuakeTable.reloadData()
                     })
                 } else {
@@ -75,7 +75,7 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
                     } else {
                         print("Unsuccessful Call to get earthquake data.")
                     }
-                    dispatch_async(dispatch_get_main_queue(),{() in
+                    dispatch_async(dispatch_get_main_queue(),{ _ in
                         strongSelf.showAlertError()
                     })
                 }
@@ -89,7 +89,7 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     private func showAlertError() {
         
         let alert = UIAlertController(title: "Error", message: "An error occurred while tyring to retreive earth quake data.  Press button below to try again", preferredStyle: UIAlertControllerStyle.Alert)
-        let action = UIAlertAction(title: "Try Again", style: UIAlertActionStyle.Default, handler: {[weak self](alert: UIAlertAction!)  -> () in
+        let action = UIAlertAction(title: "Try Again", style: UIAlertActionStyle.Default, handler: { [weak self](alert: UIAlertAction!)  -> () in
             
             if let strongSelf = self {
                 strongSelf.loadEarthQuakeData()
