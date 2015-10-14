@@ -47,10 +47,7 @@ class EarthQuakeTests: XCTestCase {
             responseArrived.fulfill()
             do {
                 asynchEarthQuakes = try inner()
-            } catch _ {
-                //fail test
-                XCTAssertFalse(true)
-            }
+            } catch _ { }
         }
         
         //wait for asynchronous call to complete before running assertions
