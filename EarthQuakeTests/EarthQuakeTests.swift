@@ -38,26 +38,25 @@ class EarthQuakeTests: XCTestCase {
         
         let trimEarthQuakeDays = 30
         let expectedEarthQuakes = buildEarthQuakeExpectedList()
-        var asynchSuccess: Bool?
-        var asynchError: NSError?
         var asynchEarthQuakes: [EarthQuake]?
         
         //get earth quake data
         let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
-        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (success, earthQuakes, error) -> () in
+        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (inner) -> () in
             
             responseArrived.fulfill()
-            asynchSuccess = success
-            asynchError = error
-            asynchEarthQuakes = earthQuakes
+            do {
+                asynchEarthQuakes = try inner()
+            } catch _ {
+                //fail test
+                XCTAssertFalse(true)
+            }
         }
         
         //wait for asynchronous call to complete before running assertions
         self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
             
             //test assertions
-            XCTAssertTrue(asynchSuccess!)
-            XCTAssertNil(asynchError)
             XCTAssertEqual(asynchEarthQuakes!.count, 11)
             
             for x in 0..<asynchEarthQuakes!.count {
@@ -73,29 +72,25 @@ class EarthQuakeTests: XCTestCase {
         
         //set up stub to use
         stub(isHost(EarthQuakes.quakeURL), response: fixture("EarthQuakeStubSuccess.xml"))
-
+        
         let trimEarthQuakeDays = 365
-        let expectedEarthQuakes = self.buildEarthQuakeExpectedList()
-        var asynchSuccess: Bool?
-        var asynchError: NSError?
+        let expectedEarthQuakes = buildEarthQuakeExpectedList()
         var asynchEarthQuakes: [EarthQuake]?
         
         //get earth quake data
         let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
-        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (success, earthQuakes, error) -> () in
+        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (inner) -> () in
             
             responseArrived.fulfill()
-            asynchSuccess = success
-            asynchError = error
-            asynchEarthQuakes = earthQuakes
+            do {
+                asynchEarthQuakes = try inner()
+            } catch _ { }
         }
         
         //wait for asynchronous call to complete before running assertions
-        self.waitForExpectationsWithTimeout(self.timeout) { _ -> Void in
+        self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
             
             //test assertions
-            XCTAssertTrue(asynchSuccess!)
-            XCTAssertNil(asynchError)
             XCTAssertEqual(asynchEarthQuakes!.count, 12)
             
             for x in 0..<asynchEarthQuakes!.count {
@@ -104,7 +99,6 @@ class EarthQuakeTests: XCTestCase {
         }
     }
 
-    
     /**
     * Tests getting earth quake for EarthQuakes data against stubs with parse error.
     */
@@ -114,27 +108,27 @@ class EarthQuakeTests: XCTestCase {
         stub(isHost(EarthQuakes.quakeURL), response: fixture("EarthQuakeStubInvalidXML.xml"))
         
         let trimEarthQuakeDays = 30
-        var asynchSuccess: Bool?
-        var asynchError: NSError?
         var asynchEarthQuakes: [EarthQuake]?
+        var asyncErrorOccurred = false
         
         //get earth quake data
         let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
-        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (success, earthQuakes, error) -> () in
+        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (inner) -> () in
             
             responseArrived.fulfill()
-            asynchSuccess = success
-            asynchError = error
-            asynchEarthQuakes = earthQuakes
+            do {
+                asynchEarthQuakes = try inner()
+            } catch QuakeError.ParseError {
+                asyncErrorOccurred = true
+            } catch _ { }
         }
         
         //wait for asynchronous call to complete before running assertions
         self.waitForExpectationsWithTimeout(self.timeout) { _ -> Void in
             
             //test assertions
-            XCTAssertFalse(asynchSuccess!)
-            XCTAssertEqual(asynchError!.code, 73)
-            XCTAssertEqual(asynchEarthQuakes!.count, 0)
+            XCTAssertTrue(asyncErrorOccurred)
+            XCTAssertNil(asynchEarthQuakes)
         }
     }
     
@@ -147,30 +141,31 @@ class EarthQuakeTests: XCTestCase {
         stub(isHost(EarthQuakes.quakeURL), response: fixture(NSData(), status: 400))
         
         let trimEarthQuakeDays = 30
-        var asynchSuccess: Bool?
-        var asynchError: NSError?
+        var asynchErrorCode: Int?
         var asynchEarthQuakes: [EarthQuake]?
         
         //get earth quake data
         let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
-        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (success, earthQuakes, error) -> () in
+        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (inner) -> () in
             
             responseArrived.fulfill()
-            asynchSuccess = success
-            asynchError = error
-            asynchEarthQuakes = earthQuakes
+            do {
+                asynchEarthQuakes = try inner()
+            } catch QuakeError.StatusCodeError(let code) {
+                asynchErrorCode = code
+            } catch _ { }
         }
+
         //wait for asynchronous call to complete before running assertions
         self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
             
             //test assertions
-            XCTAssertFalse(asynchSuccess!)
-            XCTAssertNil(asynchError)
-            XCTAssertEqual(asynchEarthQuakes!.count, 0)
+            XCTAssertEqual(asynchErrorCode, 400)
+            XCTAssertNil(asynchEarthQuakes)
         }
     }
     
-    /** 
+    /**
     * Tests getting earth quake data when network isnt available
     */
     func testGetEarthQuakeNetworkDown() {
@@ -180,22 +175,26 @@ class EarthQuakeTests: XCTestCase {
         stub(isHost(EarthQuakes.quakeURL), response: fixture(notConnectedError))
         
         let trimEarthQuakeDays = 30
-        var asynchSuccess: Bool?
         var asynchError: NSError?
+        var asynchEarthQuakes: [EarthQuake]?
         
         //get earth quake data
         let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
-        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (success, _, error) -> () in
+        EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (inner) -> () in
             
             responseArrived.fulfill()
-            asynchSuccess = success
-            asynchError = error
+            do {
+                asynchEarthQuakes = try inner()
+            } catch QuakeError.ResponseError(let error) {
+                asynchError = error
+            } catch _ { }
         }
+
         //wait for asynchronous call to complete before running assertions
         self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
-            
+
             //test assertions
-            XCTAssertFalse(asynchSuccess!)
+            XCTAssertNil(asynchEarthQuakes)
             XCTAssertEqual(asynchError!.code, -1009)
         }
     }

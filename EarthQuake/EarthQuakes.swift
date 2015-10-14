@@ -9,6 +9,13 @@
 import Foundation
 import OHHTTPStubs
 
+enum QuakeError:ErrorType {
+    
+    case StatusCodeError(code: Int)
+    case ParseError
+    case ResponseError(error:NSError)
+}
+
 /**
 * EarthQuakes class that will be responsible for retrieving and processing earthquake data.
 * Intended to be used as singleton
@@ -22,8 +29,6 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     private override init() {}
 
     private var earthQuakes = [EarthQuake]() //earthquake data -- empty by default
-    private var success = true //success of data retrieval
-    private var error: NSError? //error that may have occurred
     private var earthQuake: EarthQuake? //earthquake that will be added to list
     private var elementName = "" //the current element being parsed
     
@@ -31,9 +36,9 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     * Gets earthquake data from RSS feed with completion.
     *
     * @param days - the number of days for which earthquake data should be retrieved
-    * @param completion - completion handler that will report back earthquake data success of call and possible error
+    * @param completion - closure with inner closure that will return results or throw error
     */
-    func getEarthQuakeData(days: Int?, completion: ((success: Bool, earthQuakes: [EarthQuake], error: NSError?) -> ())) {
+    func getEarthQuakeData(days: Int?, completion: ((inner: () throws -> [EarthQuake]?) -> ())) {
 
         if let url = NSURL(string: EarthQuakes.quakeURL) {
             
@@ -45,15 +50,18 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
            
                 if let strongSelf = self {
                     
-                    //check for error
-                    strongSelf.error = error
-                    if error != nil {
-                        strongSelf.success = false
+                    //throw error in completion upon error
+                    if let error = error {
+                       completion(inner: {throw QuakeError.ResponseError(error: error)})
+                        return
                     }
                     
-                    //parse response for error
-                    if let response = response {
-                        strongSelf.success = EarthQuakes.parseResponse(response)
+                    //check for status error in response and throw error if found
+                    if let response = response, httpResponse = response as? NSHTTPURLResponse {
+                        if httpResponse.statusCode < 200 || httpResponse.statusCode > 399 {
+                            completion(inner: {throw QuakeError.StatusCodeError(code: httpResponse.statusCode)})
+                            return
+                        }
                     }
                     
                     //parse earthquake data
@@ -62,18 +70,19 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
                         //reset earthquake list
                         strongSelf.earthQuakes = [EarthQuake]()
                         
-                        //setup xml parser and start parse
+                        //setup xml parser and start parse, throw error if parse error occurs
                         let parser = NSXMLParser(data: data)
                         parser.delegate = self
                         if !parser.parse() {
-                            strongSelf.success = false
+                            completion(inner: {throw QuakeError.ParseError})
+                            return
                         }
                         
                         //trim and sort list of earthquakes
                         strongSelf.trimAndSortEarthQuakes(days, order: .OrderedDescending)
                     }
                     //call completion 
-                    completion(success: strongSelf.success, earthQuakes: strongSelf.earthQuakes, error: strongSelf.error)
+                    completion(inner: {return strongSelf.earthQuakes})
                 }
             }).resume()
         }
@@ -98,24 +107,6 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
         self.earthQuakes.sortInPlace({
             return $0.date?.compare($1.date!) == order
         })
-    }
-    
-    /**
-    * Gets status code from repsonse and checks for error
-    *
-    * @param resposne - response object to parse
-    *
-    * @return the success nature of status code in response
-    */
-    private class func parseResponse(response: NSURLResponse) -> Bool {
-        
-        if let httpResponse = response as? NSHTTPURLResponse {
-            
-            if httpResponse.statusCode < 200 || httpResponse.statusCode > 399 {
-                return false
-            }
-        }
-        return true
     }
     
     /**
@@ -179,14 +170,5 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
                     break
             }
         }
-    }
-    
-    /**
-    * NSXMLParser delegate method indicating that an error occurred while parsing
-    */
-    func parser(parser: NSXMLParser, parseErrorOccurred parseError: NSError) {
-        
-        self.success = false
-        self.error = parseError
     }
 }

@@ -55,31 +55,30 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     */
     private func loadEarthQuakeData() {
         
-        EarthQuakes.sharedInstance.getEarthQuakeData(earthQuakeDays, completion: { [weak self](success, earthQuakes, error) -> () in
+        EarthQuakes.sharedInstance.getEarthQuakeData(earthQuakeDays) { [weak self] (inner) -> () in
             
             if let strongSelf = self {
-                
-                dispatch_async(dispatch_get_main_queue(),{ _ in
-                    strongSelf.activityIndicator.stopAnimating()
-                })
+                do {
                     
-                if success {
+                    //try to get earthquake data
+                    let earthQuakes = try inner()
+                    
+                    //load table with earthquake data
                     strongSelf.earthQuakes = earthQuakes
                     dispatch_async(dispatch_get_main_queue(),{ _ in
+                        strongSelf.activityIndicator.stopAnimating()
                         strongSelf.earthQuakeTable.reloadData()
                     })
-                } else {
-                    if let error = error {
-                        print("Error occurred - \(error.localizedDescription)")
-                    } else {
-                        print("Unsuccessful Call to get earthquake data.")
-                    }
+                } catch let error {
+                    
+                    //catch exception and present error
+                    print("Error occurred - \(error)")
                     dispatch_async(dispatch_get_main_queue(),{ _ in
                         strongSelf.showAlertError()
                     })
                 }
             }
-        })
+        }
     }
     
     /**
@@ -95,9 +94,7 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
             }
         })
         alert.addAction(action)
-        dispatch_async(dispatch_get_main_queue(),{() in
-            self.presentViewController(alert, animated: true, completion: nil)
-        })
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
     /**)
