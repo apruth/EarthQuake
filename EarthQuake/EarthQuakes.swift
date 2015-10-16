@@ -13,7 +13,7 @@ enum QuakeError:ErrorType {
     
     case StatusCodeError(code: Int)
     case ParseError
-    case ResponseError(error:NSError)
+    case ResponseError(error: NSError)
 }
 
 /**
@@ -100,7 +100,9 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
         if let days = days {
             //gets date given number of days before today and filters list based on it
             let compareDate = NSDate().dateByAddingTimeInterval(Double(60*60*24*(-days)))
-            self.earthQuakes = self.earthQuakes.filter({$0.date?.compare(compareDate) == .OrderedDescending})
+            self.earthQuakes = self.earthQuakes.filter({
+                $0.date?.compare(compareDate) == .OrderedDescending
+            })
         }
         
         //sorts list of earthquakes
