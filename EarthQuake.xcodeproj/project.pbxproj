@@ -11,15 +11,15 @@
 		8B2860961BC599E0004AFD2E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B2860951BC599E0004AFD2E /* Assets.xcassets */; };
 		8B2860A41BC599E0004AFD2E /* EarthQuakeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2860A31BC599E0004AFD2E /* EarthQuakeTests.swift */; };
 		8B2860AF1BC599E0004AFD2E /* EarthQuakeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2860AE1BC599E0004AFD2E /* EarthQuakeUITests.swift */; };
-		8B2860C01BC59A3B004AFD2E /* EarthQuake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2860BC1BC59A3B004AFD2E /* EarthQuake.swift */; settings = {ASSET_TAGS = (); }; };
-		8B2860C11BC59A3B004AFD2E /* EarthQuakes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2860BD1BC59A3B004AFD2E /* EarthQuakes.swift */; settings = {ASSET_TAGS = (); }; };
-		8B2860C21BC59A3B004AFD2E /* EarthQuakeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2860BE1BC59A3B004AFD2E /* EarthQuakeTableViewCell.swift */; settings = {ASSET_TAGS = (); }; };
-		8B2860C31BC59A3B004AFD2E /* EarthQuakeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2860BF1BC59A3B004AFD2E /* EarthQuakeViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		8B2860C81BC59B13004AFD2E /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8B2860C41BC59B13004AFD2E /* LaunchScreen.xib */; settings = {ASSET_TAGS = (); }; };
-		8B2860C91BC59B13004AFD2E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B2860C61BC59B13004AFD2E /* Main.storyboard */; settings = {ASSET_TAGS = (); }; };
-		8B48FA471BC70FBC001E6790 /* EarthQuakeStubSuccess.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B80FF9F1BC6DC80007828CD /* EarthQuakeStubSuccess.xml */; settings = {ASSET_TAGS = (); }; };
-		8B48FA4E1BCC0566001E6790 /* EarthQuakeStubInvalidXML.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B48FA4C1BCC0533001E6790 /* EarthQuakeStubInvalidXML.xml */; settings = {ASSET_TAGS = (); }; };
-		F897D6195E9E29A415A62972 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD45400BF73D0354F46667DB /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		8B2860C01BC59A3B004AFD2E /* EarthQuake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2860BC1BC59A3B004AFD2E /* EarthQuake.swift */; };
+		8B2860C11BC59A3B004AFD2E /* EarthQuakes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2860BD1BC59A3B004AFD2E /* EarthQuakes.swift */; };
+		8B2860C21BC59A3B004AFD2E /* EarthQuakeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2860BE1BC59A3B004AFD2E /* EarthQuakeTableViewCell.swift */; };
+		8B2860C31BC59A3B004AFD2E /* EarthQuakeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B2860BF1BC59A3B004AFD2E /* EarthQuakeViewController.swift */; };
+		8B2860C81BC59B13004AFD2E /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8B2860C41BC59B13004AFD2E /* LaunchScreen.xib */; };
+		8B2860C91BC59B13004AFD2E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B2860C61BC59B13004AFD2E /* Main.storyboard */; };
+		8B48FA471BC70FBC001E6790 /* EarthQuakeStubSuccess.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B80FF9F1BC6DC80007828CD /* EarthQuakeStubSuccess.xml */; };
+		8B48FA4E1BCC0566001E6790 /* EarthQuakeStubInvalidXML.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B48FA4C1BCC0533001E6790 /* EarthQuakeStubInvalidXML.xml */; };
+		F897D6195E9E29A415A62972 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD45400BF73D0354F46667DB /* Pods.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
