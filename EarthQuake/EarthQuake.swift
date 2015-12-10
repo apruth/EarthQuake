@@ -21,6 +21,21 @@ class EarthQuake: Equatable {
     var link = ""
     var floorMagnitude = ""
     
+    convenience init(lattitude: String, longitude: String, dateString: String, title: String, link: String, floorMagnitude: String) {
+        self.init()
+        
+        self.lattitude = lattitude
+        self.longitude = longitude
+        
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss z"
+        self.date = dateFormatter.dateFromString(dateString)
+        
+        self.dateString = dateString
+        self.title = title
+        self.link = link
+        self.floorMagnitude = floorMagnitude
+    }
 }
 
 /**
