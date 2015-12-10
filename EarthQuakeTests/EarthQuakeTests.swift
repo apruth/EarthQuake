@@ -274,7 +274,7 @@ class EarthQuakeTests: XCTestCase {
     * Helper function which returns stubbed response for given error
     */
     private func fixture(error: NSError) -> (NSURLRequest -> OHHTTPStubsResponse) {
-        return { _ in  return OHHTTPStubsResponse(error: error) }
+        return { _ in return OHHTTPStubsResponse(error: error) }
     }
     
     /**
