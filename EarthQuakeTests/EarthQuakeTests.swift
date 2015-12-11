@@ -16,6 +16,8 @@ class EarthQuakeTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        
+        EarthQuakes.appStubs = false
     }
     
     /**

@@ -22,6 +22,7 @@ enum QuakeError:ErrorType {
 */
 class EarthQuakes: NSObject, NSXMLParserDelegate {
     
+    static var appStubs = true
     static let quakeURL = "http://earthquake.usgs.gov/earthquakes/shakemap/rss.xml"
 
     //singleton variable for EarthQuakes
@@ -39,6 +40,13 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     * @param completion - closure with inner closure that will return results or throw error
     */
     func getEarthQuakeData(days: Int?, completion: ((inner: () throws -> [EarthQuake]?) -> ())) {
+        
+        if let quakeUrl = NSURL(string: EarthQuakes.quakeURL) where EarthQuakes.appStubs {
+            stub(isHost(quakeUrl.host!)) { _ in
+                let stubPath = OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)
+                return fixture(stubPath!, headers: ["Content-Type":"application/xml"])
+            }
+        }
 
         if let url = NSURL(string: EarthQuakes.quakeURL) {
             

@@ -19,6 +19,8 @@
 		8B2860C91BC59B13004AFD2E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B2860C61BC59B13004AFD2E /* Main.storyboard */; };
 		8B48FA471BC70FBC001E6790 /* EarthQuakeStubSuccess.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B80FF9F1BC6DC80007828CD /* EarthQuakeStubSuccess.xml */; };
 		8B48FA4E1BCC0566001E6790 /* EarthQuakeStubInvalidXML.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B48FA4C1BCC0533001E6790 /* EarthQuakeStubInvalidXML.xml */; };
+		8BE4B4201C1A0EE9000D0675 /* EarthQuakeStubSuccess.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B80FF9F1BC6DC80007828CD /* EarthQuakeStubSuccess.xml */; };
+		8BE4B4211C1A0EEF000D0675 /* EarthQuakeStubInvalidXML.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8B48FA4C1BCC0533001E6790 /* EarthQuakeStubInvalidXML.xml */; };
 		F897D6195E9E29A415A62972 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD45400BF73D0354F46667DB /* Pods.framework */; };
 /* End PBXBuildFile section */
 
@@ -282,6 +284,8 @@
 			files = (
 				8B2860C81BC59B13004AFD2E /* LaunchScreen.xib in Resources */,
 				8B2860961BC599E0004AFD2E /* Assets.xcassets in Resources */,
+				8BE4B4201C1A0EE9000D0675 /* EarthQuakeStubSuccess.xml in Resources */,
+				8BE4B4211C1A0EEF000D0675 /* EarthQuakeStubInvalidXML.xml in Resources */,
 				8B2860C91BC59B13004AFD2E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
