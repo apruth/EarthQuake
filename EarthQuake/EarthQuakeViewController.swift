@@ -283,10 +283,11 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
                 } else {
                     //acccount for last section of length two
                     if tail.count == 1 && tailComponents.month == rowComponents.month && tailComponents.day == rowComponents.day {
-                        return getSectionTotal(currentSection + 1, earthQuakes: tail, previousComponents: rowComponents)
-                    } else {
-                        return getSectionTotal(currentSection, earthQuakes: tail, previousComponents: rowComponents)
+                        if let previousComponents = previousComponents where tailComponents.month != previousComponents.month || tailComponents.day != previousComponents.day {
+                            return getSectionTotal(currentSection + 1, earthQuakes: tail, previousComponents: rowComponents)
+                        }
                     }
+                    return getSectionTotal(currentSection, earthQuakes: tail, previousComponents: rowComponents)
                 }
             } else {
                 
