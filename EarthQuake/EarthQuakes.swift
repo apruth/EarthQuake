@@ -41,6 +41,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     */
     func getEarthQuakeData(days: Int?, completion: ((inner: () throws -> [EarthQuake]?) -> ())) {
         
+        //use stubs to collect earth quake data
         if let quakeUrl = NSURL(string: EarthQuakes.quakeURL) where EarthQuakes.appStubs {
             stub(isHost(quakeUrl.host!)) { _ in
                 let stubPath = OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)

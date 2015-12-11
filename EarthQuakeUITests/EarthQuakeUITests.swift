@@ -34,6 +34,5 @@ class EarthQuakeUITests: XCTestCase {
         
         let cells = XCUIApplication().tables.cells
         XCTAssertEqual(cells.count, 11, "found instead: \(cells.debugDescription)")
-
     }
 }
