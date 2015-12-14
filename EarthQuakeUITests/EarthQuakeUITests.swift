@@ -31,7 +31,7 @@ class EarthQuakeUITests: XCTestCase {
     func testInitialLoad() {
         
         let cells = XCUIApplication().tables.cells
-        XCTAssertEqual(cells.count, 11, "found instead: \(cells.debugDescription)")
+        XCTAssertEqual(cells.count, 11)
         XCTAssertTrue(compareEarthQuakeData(0, earthQuakeDataIndex: 0))
         XCTAssertTrue(compareEarthQuakeData(1, earthQuakeDataIndex: 1))
         XCTAssertTrue(compareEarthQuakeData(2, earthQuakeDataIndex: 2))
@@ -44,6 +44,101 @@ class EarthQuakeUITests: XCTestCase {
         XCTAssertTrue(compareEarthQuakeData(9, earthQuakeDataIndex: 9))
         XCTAssertTrue(compareEarthQuakeData(10, earthQuakeDataIndex: 10))
     }
+    
+    func testDeleteCell2() {
+        
+        //delete cell 2
+        let tablesQuery = XCUIApplication().tables
+        tablesQuery.staticTexts["Tue, 08 Dec 2015 08:27:04"].swipeLeft()
+        tablesQuery.buttons["Delete"].tap()
+        
+        let cells = XCUIApplication().tables.cells
+        XCTAssertEqual(cells.count, 10)
+        XCTAssertTrue(compareEarthQuakeData(0, earthQuakeDataIndex: 0))
+        XCTAssertTrue(compareEarthQuakeData(1, earthQuakeDataIndex: 2))
+        XCTAssertTrue(compareEarthQuakeData(2, earthQuakeDataIndex: 3))
+        XCTAssertTrue(compareEarthQuakeData(3, earthQuakeDataIndex: 4))
+        XCTAssertTrue(compareEarthQuakeData(4, earthQuakeDataIndex: 5))
+        XCTAssertTrue(compareEarthQuakeData(5, earthQuakeDataIndex: 6))
+        XCTAssertTrue(compareEarthQuakeData(6, earthQuakeDataIndex: 7))
+        XCTAssertTrue(compareEarthQuakeData(7, earthQuakeDataIndex: 8))
+        XCTAssertTrue(compareEarthQuakeData(8, earthQuakeDataIndex: 9))
+        XCTAssertTrue(compareEarthQuakeData(9, earthQuakeDataIndex: 10))
+    }
+    
+    func testDeleteCell1() {
+        
+        //delete cell 1
+        let tablesQuery = XCUIApplication().tables
+        tablesQuery.staticTexts["Tue, 08 Dec 2015 08:46:28"].swipeLeft()
+        tablesQuery.buttons["Delete"].tap()
+        
+        let cells = XCUIApplication().tables.cells
+        XCTAssertEqual(cells.count, 10)
+        XCTAssertTrue(compareEarthQuakeData(0, earthQuakeDataIndex: 1))
+        XCTAssertTrue(compareEarthQuakeData(1, earthQuakeDataIndex: 2))
+        XCTAssertTrue(compareEarthQuakeData(2, earthQuakeDataIndex: 3))
+        XCTAssertTrue(compareEarthQuakeData(3, earthQuakeDataIndex: 4))
+        XCTAssertTrue(compareEarthQuakeData(4, earthQuakeDataIndex: 5))
+        XCTAssertTrue(compareEarthQuakeData(5, earthQuakeDataIndex: 6))
+        XCTAssertTrue(compareEarthQuakeData(6, earthQuakeDataIndex: 7))
+        XCTAssertTrue(compareEarthQuakeData(7, earthQuakeDataIndex: 8))
+        XCTAssertTrue(compareEarthQuakeData(8, earthQuakeDataIndex: 9))
+        XCTAssertTrue(compareEarthQuakeData(9, earthQuakeDataIndex: 10))
+    }
+
+    func testDeleteCell11() {
+        
+        //delete cell 11
+        let tablesQuery = XCUIApplication().tables
+        let firstCell = tablesQuery.staticTexts["Sat, 05 Dec 2015 16:56:26"]
+        let lastCell = tablesQuery.staticTexts["Tue, 08 Dec 2015 08:46:28"]
+        firstCell.pressForDuration(0, thenDragToElement: lastCell)
+        tablesQuery.staticTexts["Fri, 04 Dec 2015 10:15:25"].swipeLeft()
+        tablesQuery.buttons["Delete"].tap()
+        
+        let cells = XCUIApplication().tables.cells
+        XCTAssertEqual(cells.count, 10)
+        XCTAssertTrue(compareEarthQuakeData(0, earthQuakeDataIndex: 0))
+        XCTAssertTrue(compareEarthQuakeData(1, earthQuakeDataIndex: 1))
+        XCTAssertTrue(compareEarthQuakeData(2, earthQuakeDataIndex: 2))
+        XCTAssertTrue(compareEarthQuakeData(3, earthQuakeDataIndex: 3))
+        XCTAssertTrue(compareEarthQuakeData(4, earthQuakeDataIndex: 4))
+        XCTAssertTrue(compareEarthQuakeData(5, earthQuakeDataIndex: 5))
+        XCTAssertTrue(compareEarthQuakeData(6, earthQuakeDataIndex: 6))
+        XCTAssertTrue(compareEarthQuakeData(7, earthQuakeDataIndex: 7))
+        XCTAssertTrue(compareEarthQuakeData(8, earthQuakeDataIndex: 8))
+        XCTAssertTrue(compareEarthQuakeData(9, earthQuakeDataIndex: 9))
+    }
+    
+    func testTableRefresh() {
+        
+        //delete cell 1
+        let tablesQuery = XCUIApplication().tables
+        tablesQuery.staticTexts["Tue, 08 Dec 2015 08:46:28"].swipeLeft()
+        tablesQuery.buttons["Delete"].tap()
+        
+        //refresh table
+        let firstCell = tablesQuery.staticTexts["Tue, 08 Dec 2015 08:27:04"]
+        let lastCell = tablesQuery.staticTexts["Sat, 05 Dec 2015 16:56:26"]
+        firstCell.pressForDuration(0, thenDragToElement: lastCell)
+        
+        
+        let cells = XCUIApplication().tables.cells
+        XCTAssertEqual(cells.count, 11)
+        XCTAssertTrue(compareEarthQuakeData(0, earthQuakeDataIndex: 0))
+        XCTAssertTrue(compareEarthQuakeData(1, earthQuakeDataIndex: 1))
+        XCTAssertTrue(compareEarthQuakeData(2, earthQuakeDataIndex: 2))
+        XCTAssertTrue(compareEarthQuakeData(3, earthQuakeDataIndex: 3))
+        XCTAssertTrue(compareEarthQuakeData(4, earthQuakeDataIndex: 4))
+        XCTAssertTrue(compareEarthQuakeData(5, earthQuakeDataIndex: 5))
+        XCTAssertTrue(compareEarthQuakeData(6, earthQuakeDataIndex: 6))
+        XCTAssertTrue(compareEarthQuakeData(7, earthQuakeDataIndex: 7))
+        XCTAssertTrue(compareEarthQuakeData(8, earthQuakeDataIndex: 8))
+        XCTAssertTrue(compareEarthQuakeData(9, earthQuakeDataIndex: 9))
+        XCTAssertTrue(compareEarthQuakeData(10, earthQuakeDataIndex: 10))
+    }
+
     
     private func compareEarthQuakeData(cellIndex: UInt, earthQuakeDataIndex: Int) -> Bool {
         
