@@ -12,20 +12,13 @@ class EarthQuakeUITests: XCTestCase {
         
     override func setUp() {
         super.setUp()
-        
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-        
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-        // UI tests must launch the application that they test. Doing this in setup will make sure it happens for each test method.
         XCUIApplication().launch()
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
+        XCUIApplication().terminate()
     }
     
     func testInitialLoad() {
@@ -118,13 +111,24 @@ class EarthQuakeUITests: XCTestCase {
         tablesQuery.staticTexts["Tue, 08 Dec 2015 08:46:28"].swipeLeft()
         tablesQuery.buttons["Delete"].tap()
         
+        let cells = XCUIApplication().tables.cells
+        XCTAssertEqual(cells.count, 10)
+        XCTAssertTrue(compareEarthQuakeData(0, earthQuakeDataIndex: 1))
+        XCTAssertTrue(compareEarthQuakeData(1, earthQuakeDataIndex: 2))
+        XCTAssertTrue(compareEarthQuakeData(2, earthQuakeDataIndex: 3))
+        XCTAssertTrue(compareEarthQuakeData(3, earthQuakeDataIndex: 4))
+        XCTAssertTrue(compareEarthQuakeData(4, earthQuakeDataIndex: 5))
+        XCTAssertTrue(compareEarthQuakeData(5, earthQuakeDataIndex: 6))
+        XCTAssertTrue(compareEarthQuakeData(6, earthQuakeDataIndex: 7))
+        XCTAssertTrue(compareEarthQuakeData(7, earthQuakeDataIndex: 8))
+        XCTAssertTrue(compareEarthQuakeData(8, earthQuakeDataIndex: 9))
+        XCTAssertTrue(compareEarthQuakeData(9, earthQuakeDataIndex: 10))
+        
         //refresh table
         let firstCell = tablesQuery.staticTexts["Tue, 08 Dec 2015 08:27:04"]
         let lastCell = tablesQuery.staticTexts["Sat, 05 Dec 2015 16:56:26"]
         firstCell.pressForDuration(0, thenDragToElement: lastCell)
         
-        
-        let cells = XCUIApplication().tables.cells
         XCTAssertEqual(cells.count, 11)
         XCTAssertTrue(compareEarthQuakeData(0, earthQuakeDataIndex: 0))
         XCTAssertTrue(compareEarthQuakeData(1, earthQuakeDataIndex: 1))
@@ -138,7 +142,15 @@ class EarthQuakeUITests: XCTestCase {
         XCTAssertTrue(compareEarthQuakeData(9, earthQuakeDataIndex: 9))
         XCTAssertTrue(compareEarthQuakeData(10, earthQuakeDataIndex: 10))
     }
-
+    
+    //test cell tap transition to web page url
+//    func testTransitionToURL() {
+//        
+//        let app = XCUIApplication()
+//        app.tables.staticTexts["3.8 - 141.4 miles WSW of Adak"].tap()
+//        
+//        XCTAssertFalse(app.tables.staticTexts["3.8 - 141.4 miles WSW of Adak"].exists)
+//    }
     
     private func compareEarthQuakeData(cellIndex: UInt, earthQuakeDataIndex: Int) -> Bool {
         
