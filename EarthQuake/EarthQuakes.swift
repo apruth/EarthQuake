@@ -9,18 +9,18 @@
 import Foundation
 import OHHTTPStubs
 
-enum QuakeError:ErrorType {
+enum QuakeError: Error {
     
-    case StatusCodeError(code: Int)
-    case ParseError
-    case ResponseError(error: NSError)
+    case statusCodeError(code: Int)
+    case parseError
+    case responseError(error: NSError)
 }
 
 /**
 * EarthQuakes class that will be responsible for retrieving and processing earthquake data.
 * Intended to be used as singleton
 */
-class EarthQuakes: NSObject, NSXMLParserDelegate {
+class EarthQuakes: NSObject, XMLParserDelegate {
     
     static var appStubs = true
     static let quakeURL = "http://earthquake.usgs.gov/earthquakes/shakemap/rss.xml"
@@ -29,7 +29,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     static let sharedInstance = EarthQuakes()
     private override init() {}
 
-    private var earthQuakes = [EarthQuake]() //earthquake data -- empty by default
+    var earthQuakes = [EarthQuake]() //earthquake data -- empty by default
     private var earthQuake: EarthQuake? //earthquake that will be added to list
     private var elementName = "" //the current element being parsed
     
@@ -39,36 +39,36 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     * @param days - the number of days for which earthquake data should be retrieved
     * @param completion - closure with inner closure that will return results or throw error
     */
-    func getEarthQuakeData(days: Int?, completion: ((inner: () throws -> [EarthQuake]?) -> ())) {
+    func getEarthQuakeData(_ days: Int?, completion: @escaping ((_ inner: () throws -> [EarthQuake]?) -> ())) {
         
         //use stubs to collect earth quake data
-        if let quakeUrl = NSURL(string: EarthQuakes.quakeURL) where EarthQuakes.appStubs {
-            stub(isHost(quakeUrl.host!)) { _ in
-                let stubPath = OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)
-                return fixture(stubPath!, headers: ["Content-Type":"application/xml"])
-            }
-        }
+//        if let quakeUrl = URL(string: EarthQuakes.quakeURL) where EarthQuakes.appStubs {
+//           stub(isHost(quakeUrl.host!)) { _ in
+//                let stubPath = OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)
+//                return fixture(stubPath!, headers: ["Content-Type":"application/xml"])
+//            }
+//        }
 
-        if let url = NSURL(string: EarthQuakes.quakeURL) {
+        if let url = URL(string: EarthQuakes.quakeURL) {
             
-            let request = NSURLRequest(URL: url) //request to earthquake data
-            let session = NSURLSession.sharedSession()
+            let request = URLRequest(url: url) //request to earthquake data
+            let session = URLSession.shared
             
             //send request to get earthquake data asynchronously with completion
-            session.dataTaskWithRequest(request, completionHandler: { [weak self] (data, response, error) -> Void in
+            session.dataTask(with: request, completionHandler: { [weak self] (data, response, error) -> Void in
            
                 if let strongSelf = self {
                     
                     //throw error in completion upon error
                     if let error = error {
-                       completion(inner: {throw QuakeError.ResponseError(error: error)})
+                       completion({throw QuakeError.responseError(error: error as NSError)})
                         return
                     }
                     
                     //check for status error in response and throw error if found
-                    if let response = response, httpResponse = response as? NSHTTPURLResponse {
+                    if let response = response, let httpResponse = response as? HTTPURLResponse {
                         if httpResponse.statusCode < 200 || httpResponse.statusCode > 399 {
-                            completion(inner: {throw QuakeError.StatusCodeError(code: httpResponse.statusCode)})
+                            completion({throw QuakeError.statusCodeError(code: httpResponse.statusCode)})
                             return
                         }
                     }
@@ -80,18 +80,18 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
                         strongSelf.earthQuakes = [EarthQuake]()
                         
                         //setup xml parser and start parse, throw error if parse error occurs
-                        let parser = NSXMLParser(data: data)
+                        let parser = XMLParser(data: data)
                         parser.delegate = self
                         if !parser.parse() {
-                            completion(inner: {throw QuakeError.ParseError})
+                            completion({throw QuakeError.parseError})
                             return
                         }
                         
                         //trim and sort list of earthquakes
-                        strongSelf.trimAndSortEarthQuakes(days, order: .OrderedDescending)
+                        strongSelf.trimAndSortEarthQuakes(days, order: .orderedDescending)
                     }
                     //call completion 
-                    completion(inner: {return strongSelf.earthQuakes})
+                    completion({return strongSelf.earthQuakes})
                 }
             }).resume()
         }
@@ -104,26 +104,26 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     * @param days - the number of days from today as optional
     * @param order - the order in which to sort earth quake data
     */
-    private func trimAndSortEarthQuakes(days: Int?, order: NSComparisonResult) {
+    private func trimAndSortEarthQuakes(_ days: Int?, order: ComparisonResult) {
         
         if let days = days {
             //gets date given number of days before today and filters list based on it
-            let compareDate = NSDate().dateByAddingTimeInterval(Double(60*60*24*(-days)))
+            let compareDate = Date().addingTimeInterval(Double(60*60*24*(-days)))
             self.earthQuakes = self.earthQuakes.filter({
-                $0.date?.compare(compareDate) == .OrderedDescending
+                $0.date?.compare(compareDate) == .orderedDescending
             })
         }
         
         //sorts list of earthquakes
-        self.earthQuakes.sortInPlace({
-            return $0.date?.compare($1.date!) == order
+        self.earthQuakes.sort(by: {
+            return $0.date?.compare($1.date! as Date) == order
         })
     }
     
     /**
     * NSXMLParser delegate method indicating that parsing has started for an element
     */
-    func parser(parser: NSXMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName: String?, attributes attributeDict: [String: String]) {
+    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName: String?, attributes attributeDict: [String: String]) {
         
         switch elementName {
             
@@ -138,7 +138,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     /**
     * NSXMLParser delegate method indicating that parsing has ended for element
     */
-    func parser(parser: NSXMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName: String?) {
+    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName: String?) {
         
         if let earthQuake = self.earthQuake {
             switch elementName {
@@ -148,9 +148,9 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
                     self.earthQuakes.append(earthQuake)
                 case "pubDate":
                     //add nsdate to earthquake with format like "Tue, 16 Jun 2015 09:42:04 +0000"
-                    let dateFormatter = NSDateFormatter()
+                    let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss z"
-                    earthQuake.date = dateFormatter.dateFromString(earthQuake.dateString)
+                    earthQuake.date = dateFormatter.date(from: earthQuake.dateString)
                 default:
                     break
             }
@@ -160,7 +160,7 @@ class EarthQuakes: NSObject, NSXMLParserDelegate {
     /**
     * NSXMLParser delegate method indicating that there were some charachters found in parsing
     */
-    func parser(parser: NSXMLParser, foundCharacters string: String) {
+    func parser(_ parser: XMLParser, foundCharacters string: String) {
         
         if let earthQuake = self.earthQuake {
             switch self.elementName {

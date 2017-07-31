@@ -86,7 +86,7 @@ class EarthQuakeUITests: XCTestCase {
         let tablesQuery = XCUIApplication().tables
         let firstCell = tablesQuery.staticTexts["Sat, 05 Dec 2015 16:56:26"]
         let lastCell = tablesQuery.staticTexts["Tue, 08 Dec 2015 08:46:28"]
-        firstCell.pressForDuration(0, thenDragToElement: lastCell)
+        firstCell.press(forDuration: 0, thenDragTo: lastCell)
         tablesQuery.staticTexts["Fri, 04 Dec 2015 10:15:25"].swipeLeft()
         tablesQuery.buttons["Delete"].tap()
         
@@ -127,7 +127,7 @@ class EarthQuakeUITests: XCTestCase {
         //refresh table
         let firstCell = tablesQuery.staticTexts["Tue, 08 Dec 2015 08:27:04"]
         let lastCell = tablesQuery.staticTexts["Sat, 05 Dec 2015 16:56:26"]
-        firstCell.pressForDuration(0, thenDragToElement: lastCell)
+        firstCell.press(forDuration: 0, thenDragTo: lastCell)
         
         XCTAssertEqual(cells.count, 11)
         XCTAssertTrue(compareEarthQuakeData(0, earthQuakeDataIndex: 0))
@@ -152,10 +152,10 @@ class EarthQuakeUITests: XCTestCase {
 //        XCTAssertFalse(app.tables.staticTexts["3.8 - 141.4 miles WSW of Adak"].exists)
 //    }
     
-    private func compareEarthQuakeData(cellIndex: UInt, earthQuakeDataIndex: Int) -> Bool {
+    private func compareEarthQuakeData(_ cellIndex: UInt, earthQuakeDataIndex: Int) -> Bool {
         
         let cells = XCUIApplication().tables.cells
-        return cells.elementBoundByIndex(cellIndex).staticTexts.elementBoundByIndex(0).label == self.getEarthQuakeCellData(earthQuakeDataIndex).label1 && cells.elementBoundByIndex(cellIndex).staticTexts.elementBoundByIndex(1).label == self.getEarthQuakeCellData(earthQuakeDataIndex).label2 && cells.elementBoundByIndex(cellIndex).staticTexts.elementBoundByIndex(2).label == self.getEarthQuakeCellData(earthQuakeDataIndex).label3
+        return cells.element(boundBy: cellIndex).staticTexts.element(boundBy: 0).label == self.getEarthQuakeCellData(earthQuakeDataIndex).label1 && cells.element(boundBy: cellIndex).staticTexts.element(boundBy: 1).label == self.getEarthQuakeCellData(earthQuakeDataIndex).label2 && cells.element(boundBy: cellIndex).staticTexts.element(boundBy: 2).label == self.getEarthQuakeCellData(earthQuakeDataIndex).label3
     }
     
     private struct earthQuakeCellData {
@@ -165,7 +165,7 @@ class EarthQuakeUITests: XCTestCase {
         var label3 = ""
     }
     
-    private func getEarthQuakeCellData(index: Int) -> earthQuakeCellData {
+    private func getEarthQuakeCellData(_ index: Int) -> earthQuakeCellData {
         
         var earthQuakeData = earthQuakeCellData()
         

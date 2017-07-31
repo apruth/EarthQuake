@@ -15,7 +15,7 @@ class EarthQuake: Equatable {
     
     var lattitude = ""
     var longitude = ""
-    var date: NSDate?
+    var date: Date?
     var dateString = ""
     var title = ""
     var link = ""
@@ -27,9 +27,9 @@ class EarthQuake: Equatable {
         self.lattitude = lattitude
         self.longitude = longitude
         
-        let dateFormatter = NSDateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss z"
-        self.date = dateFormatter.dateFromString(dateString)
+        self.date = dateFormatter.date(from: dateString)
         
         self.dateString = dateString
         self.title = title

@@ -12,7 +12,7 @@ import OHHTTPStubs
 
 class EarthQuakeTests: XCTestCase {
     
-    let timeout = NSTimeInterval(3.0)
+    let timeout = TimeInterval(3.0)
 
     override func setUp() {
         super.setUp()
@@ -36,7 +36,7 @@ class EarthQuakeTests: XCTestCase {
     func testGetEarthQuakeDataSuccessAt30() {
         
         //set up stub to use
-        if let quakeUrl = NSURL(string: EarthQuakes.quakeURL) {
+        if let quakeUrl = URL(string: EarthQuakes.quakeURL) {
             stub(isHost(quakeUrl.host!)) { _ in
                 let stubPath = OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)
                 return fixture(stubPath!, headers: ["Content-Type":"application/xml"])
@@ -48,7 +48,7 @@ class EarthQuakeTests: XCTestCase {
         var asynchEarthQuakes: [EarthQuake]?
         
         //get earth quake data
-        let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
+        let responseArrived = self.expectation(description: "Response of async request has arrived.")
         EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (inner) -> () in
             
             responseArrived.fulfill()
@@ -58,7 +58,7 @@ class EarthQuakeTests: XCTestCase {
         }
         
         //wait for asynchronous call to complete before running assertions
-        self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
+        self.waitForExpectations(timeout: timeout) { _ -> Void in
             
             //test assertions
             XCTAssertEqual(asynchEarthQuakes!.count, 11)
@@ -75,7 +75,7 @@ class EarthQuakeTests: XCTestCase {
     func testGetEarthQuakeDataSuccessAt365() {
         
         //set up stub to use
-        if let quakeUrl = NSURL(string: EarthQuakes.quakeURL) {
+        if let quakeUrl = URL(string: EarthQuakes.quakeURL) {
             stub(isHost(quakeUrl.host!)) { _ in
                 let stubPath = OHPathForFile("EarthQuakeStubSuccess.xml", self.dynamicType)
                 return fixture(stubPath!, headers: ["Content-Type":"application/xml"])
@@ -87,7 +87,7 @@ class EarthQuakeTests: XCTestCase {
         var asynchEarthQuakes: [EarthQuake]?
         
         //get earth quake data
-        let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
+        let responseArrived = self.expectation(description: "Response of async request has arrived.")
         EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (inner) -> () in
             
             responseArrived.fulfill()
@@ -97,7 +97,7 @@ class EarthQuakeTests: XCTestCase {
         }
         
         //wait for asynchronous call to complete before running assertions
-        self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
+        self.waitForExpectations(timeout: timeout) { _ -> Void in
             
             //test assertions
             XCTAssertEqual(asynchEarthQuakes!.count, 12)
@@ -114,7 +114,7 @@ class EarthQuakeTests: XCTestCase {
     func testGetEarthQuakeDataParseError() {
         
         //set up stub to use
-        if let quakeUrl = NSURL(string: EarthQuakes.quakeURL) {
+        if let quakeUrl = URL(string: EarthQuakes.quakeURL) {
             stub(isHost(quakeUrl.host!)) { _ in
                 let stubPath = OHPathForFile("EarthQuakeStubInvalidXML.xml", self.dynamicType)
                 return fixture(stubPath!, headers: ["Content-Type":"application/xml"])
@@ -126,7 +126,7 @@ class EarthQuakeTests: XCTestCase {
         var asyncErrorOccurred = false
         
         //get earth quake data
-        let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
+        let responseArrived = self.expectation(description: "Response of async request has arrived.")
         EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (inner) -> () in
             
             responseArrived.fulfill()
@@ -138,7 +138,7 @@ class EarthQuakeTests: XCTestCase {
         }
         
         //wait for asynchronous call to complete before running assertions
-        self.waitForExpectationsWithTimeout(self.timeout) { _ -> Void in
+        self.waitForExpectations(timeout: self.timeout) { _ -> Void in
             
             //test assertions
             XCTAssertTrue(asyncErrorOccurred)
@@ -152,7 +152,7 @@ class EarthQuakeTests: XCTestCase {
     func testGetEarthQuakeDataError() {
         
         //set up stub to use
-        if let quakeUrl = NSURL(string: EarthQuakes.quakeURL) {
+        if let quakeUrl = URL(string: EarthQuakes.quakeURL) {
             stub(isHost(quakeUrl.host!)) { _ in
                 let stubPath = OHPathForFile("EarthQuakeStubInvalidXML.xml", self.dynamicType)
                 return fixture(stubPath!, status: 400, headers: ["Content-Type":"application/xml"])
@@ -165,7 +165,7 @@ class EarthQuakeTests: XCTestCase {
         var asynchEarthQuakes: [EarthQuake]?
         
         //get earth quake data
-        let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
+        let responseArrived = self.expectation(description: "Response of async request has arrived.")
         EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (inner) -> () in
             
             responseArrived.fulfill()
@@ -177,7 +177,7 @@ class EarthQuakeTests: XCTestCase {
         }
 
         //wait for asynchronous call to complete before running assertions
-        self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
+        self.waitForExpectations(timeout: timeout) { _ -> Void in
             
             //test assertions
             XCTAssertEqual(asynchErrorCode, 400)
@@ -190,9 +190,9 @@ class EarthQuakeTests: XCTestCase {
     */
     func testGetEarthQuakeNetworkDown() {
         
-        let notConnectedError = NSError(domain:NSURLErrorDomain, code:Int(CFNetworkErrors.CFURLErrorNotConnectedToInternet.rawValue), userInfo:nil)
+        let notConnectedError = NSError(domain:NSURLErrorDomain, code:Int(CFNetworkErrors.cfurlErrorNotConnectedToInternet.rawValue), userInfo:nil)
         //set up stub to use
-        if let quakeUrl = NSURL(string: EarthQuakes.quakeURL) {
+        if let quakeUrl = URL(string: EarthQuakes.quakeURL) {
             stub(isHost(quakeUrl.host!)) { _ in
                  return OHHTTPStubsResponse(error: notConnectedError)
             }
@@ -203,7 +203,7 @@ class EarthQuakeTests: XCTestCase {
         var asynchEarthQuakes: [EarthQuake]?
         
         //get earth quake data
-        let responseArrived = self.expectationWithDescription("Response of async request has arrived.")
+        let responseArrived = self.expectation(description: "Response of async request has arrived.")
         EarthQuakes.sharedInstance.getEarthQuakeData(trimEarthQuakeDays) { (inner) -> () in
             
             responseArrived.fulfill()
@@ -215,7 +215,7 @@ class EarthQuakeTests: XCTestCase {
         }
 
         //wait for asynchronous call to complete before running assertions
-        self.waitForExpectationsWithTimeout(timeout) { _ -> Void in
+        self.waitForExpectations(timeout: timeout) { _ -> Void in
 
             //test assertions
             XCTAssertNil(asynchEarthQuakes)
@@ -226,7 +226,7 @@ class EarthQuakeTests: XCTestCase {
     //performance test ... future use (additionally OHTTPS allows for setting request/response and download times)
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        self.measureBlock {
+        self.measure {
             // Put the code you want to measure the time of here.
         }
     }

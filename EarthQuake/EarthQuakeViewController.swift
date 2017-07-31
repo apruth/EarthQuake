@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import UserNotifications
+import CoreLocation
 
 /**
 * EarthQuakeViewController - View containing UI components that will display and interact with earthquake data and user.
@@ -16,6 +18,7 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     private let earthQuakeDays = 30
     private var earthQuakes: [EarthQuake]?
     private var refreshControl: UIRefreshControl!
+    private let locationNotificationRecuestIdentifier = "LocationRequest"
     
     @IBOutlet weak var earthQuakeTable: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -23,14 +26,17 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //remove all previously set location notifications
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [locationNotificationRecuestIdentifier])
+        
         //establish tableview refresh control
         self.refreshControl = UIRefreshControl()
-        self.refreshControl.addTarget(self, action: "refreshTable:", forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl.addTarget(self, action: #selector(EarthQuakeViewController.refreshTable(_:)), for: UIControlEvents.valueChanged)
         self.earthQuakeTable.addSubview(self.refreshControl)
         
         //show activity indicator until data is loaded
         self.activityIndicator.startAnimating()
-        self.activityIndicator.hidden = false
+        self.activityIndicator.isHidden = false
         
         //load earth quake data
         self.loadEarthQuakeData()
@@ -39,11 +45,11 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     /**
     * Action fired when table view is refreshed
     */
-    func refreshTable(sender: AnyObject) {
+    func refreshTable(_ sender: AnyObject) {
         
         //reload earthquake data
         loadEarthQuakeData()
-        dispatch_async(dispatch_get_main_queue(),{[weak self] in
+        DispatchQueue.main.async(execute: {[weak self] in
             if let strongSelf = self {
                 strongSelf.refreshControl.endRefreshing()
             }
@@ -65,7 +71,7 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
                     
                     //load table with earthquake data
                     strongSelf.earthQuakes = earthQuakes
-                    dispatch_async(dispatch_get_main_queue(),{ _ in
+                    DispatchQueue.main.async(execute: { _ in
                         strongSelf.activityIndicator.stopAnimating()
                         strongSelf.earthQuakeTable.reloadData()
                     })
@@ -73,7 +79,7 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
                     
                     //catch exception and present error
                     print("Error occurred - \(error)")
-                    dispatch_async(dispatch_get_main_queue(),{ _ in
+                    DispatchQueue.main.async(execute: { _ in
                         strongSelf.showAlertError()
                     })
                 }
@@ -86,21 +92,21 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     */
     private func showAlertError() {
         
-        let alert = UIAlertController(title: "Error", message: "An error occurred while tyring to retreive earth quake data.  Press button below to try again", preferredStyle: UIAlertControllerStyle.Alert)
-        let action = UIAlertAction(title: "Try Again", style: UIAlertActionStyle.Default, handler: { [weak self](alert: UIAlertAction!)  -> () in
+        let alert = UIAlertController(title: "Error", message: "An error occurred while tyring to retreive earth quake data.  Press button below to try again", preferredStyle: UIAlertControllerStyle.alert)
+        let action = UIAlertAction(title: "Try Again", style: UIAlertActionStyle.default, handler: { [weak self](alert: UIAlertAction!)  -> () in
             
             if let strongSelf = self {
                 strongSelf.loadEarthQuakeData()
             }
         })
         alert.addAction(action)
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
     
     /**)
     * UITableView datasource method for returning the number of sections in a table
     */
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         
         return EarthQuakeViewController.getSectionTotal(0, earthQuakes: self.earthQuakes, previousComponents: nil)
     }
@@ -108,14 +114,14 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     /**
     * UITableView datasource method for returning number of rows in a section
     */
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         //construct index path
-        let indexPath = NSIndexPath(forRow: 0, inSection: section)
+        let indexPath = IndexPath(row: 0, section: section)
         
-        if let earthQuake = EarthQuakeViewController.getEarthQuakeForIndexPath(indexPath, currentRow: 0, currentSection: 0, earthQuakes: self.earthQuakes), sectionDate = earthQuake.date {
+        if let earthQuake = EarthQuakeViewController.getEarthQuakeForIndexPath(indexPath, currentRow: 0, currentSection: 0, earthQuakes: self.earthQuakes), let sectionDate = earthQuake.date {
                 
-            let dateComponentsForSection = EarthQuakeViewController.getDateComponentsForDate(sectionDate)
+            let dateComponentsForSection = EarthQuakeViewController.getDateComponentsForDate(sectionDate as Date)
             return EarthQuakeViewController.getNumberOfRowsForDate(dateComponentsForSection, earthQuakes: self.earthQuakes)
         }
         return 0
@@ -124,21 +130,21 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     /**
     * UITableView datasource method for building table
     */
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         var tableCell = UITableViewCell()
         
         if let earthQuake = EarthQuakeViewController.getEarthQuakeForIndexPath(indexPath, currentRow: 0, currentSection: 0, earthQuakes: self.earthQuakes),
-            earthQuakeCell = tableView.dequeueReusableCellWithIdentifier("EarthQuakeTableViewCell") as? EarthQuakeTableViewCell {
+            let earthQuakeCell = tableView.dequeueReusableCell(withIdentifier: "EarthQuakeTableViewCell") as? EarthQuakeTableViewCell {
             
             //set title, longitude, lattitude, and date for cell
             earthQuakeCell.titleLabel.text = earthQuake.title
             earthQuakeCell.latlonLabel.text = "Lat: \(earthQuake.lattitude) Lon: \(earthQuake.longitude)"
                 
             if let earthQuakeDate = earthQuake.date {
-                let dateFormatter = NSDateFormatter()
+                let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss"
-                earthQuakeCell.dateLabel.text = dateFormatter.stringFromDate(earthQuakeDate)
+                earthQuakeCell.dateLabel.text = dateFormatter.string(from: earthQuakeDate as Date)
             }
                 
             let magSevenColor = UIColor(red: CGFloat(255)/255, green: CGFloat(50)/255, blue: CGFloat(30)/255, alpha: 1.0)
@@ -151,11 +157,29 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
                 } else if magnitude >= 5 {
                     earthQuakeCell.backgroundColor = magFiveColor
                 } else {
-                    earthQuakeCell.backgroundColor = UIColor.whiteColor()
+                    earthQuakeCell.backgroundColor = UIColor.white
                 }
             }
 
             tableCell = earthQuakeCell
+            
+            //set location notification
+            let content = UNMutableNotificationContent()
+            content.title = "EarthQuake!"
+            content.subtitle = "Nearby & Recent Earthquake"
+            content.body = "An earthquake happened here recently."
+            content.sound = UNNotificationSound.default()
+            
+            let lattitude = CLLocationDegrees(earthQuake.lattitude)!
+            let longitude = CLLocationDegrees(earthQuake.longitude)!
+            let center = CLLocationCoordinate2DMake(lattitude, longitude)
+            let region = CLCircularRegion.init(center: center, radius: 2000.0, identifier: earthQuake.title)
+            region.notifyOnEntry = true;
+            region.notifyOnExit = false;
+            
+            let trigger = UNLocationNotificationTrigger.init(region: region, repeats: false)
+            let request = UNNotificationRequest(identifier: locationNotificationRecuestIdentifier, content: content, trigger: trigger)
+            UNUserNotificationCenter.current().add(request)
         }
         return tableCell
     }
@@ -163,17 +187,17 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     /**
     * UITableView datasource method for getting header titles
     */
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
         //construct index path
-        let indexPath = NSIndexPath(forRow: 0, inSection: section)
+        let indexPath = IndexPath(row: 0, section: section)
         
-        if let earthQuake = EarthQuakeViewController.getEarthQuakeForIndexPath(indexPath, currentRow: 0, currentSection: 0, earthQuakes: self.earthQuakes), sectionDate = earthQuake.date {
+        if let earthQuake = EarthQuakeViewController.getEarthQuakeForIndexPath(indexPath, currentRow: 0, currentSection: 0, earthQuakes: self.earthQuakes), let sectionDate = earthQuake.date {
                 
-            let dateComponentsForSection = EarthQuakeViewController.getDateComponentsForDate(sectionDate)
-            let monthName: AnyObject = NSDateFormatter().monthSymbols[dateComponentsForSection.month - 1]
+            let dateComponentsForSection = EarthQuakeViewController.getDateComponentsForDate(sectionDate as Date)
+            let monthName = DateFormatter().monthSymbols[dateComponentsForSection.month! - 1]
                 
-            return "\(monthName) \(dateComponentsForSection.day)"
+            return "\(monthName) \(dateComponentsForSection.day!)"
         }
         return ""
     }
@@ -181,16 +205,16 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     /**
     * UITableView datasource method indicating that a row can be deleted
     */
-    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
     
     /**
     * UITableView datasource method for deleting a table cell
     */
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         
-        if let earthQuake = EarthQuakeViewController.getEarthQuakeForIndexPath(indexPath, currentRow: 0, currentSection: 0, earthQuakes: self.earthQuakes), earthQuakes = self.earthQuakes {
+        if let earthQuake = EarthQuakeViewController.getEarthQuakeForIndexPath(indexPath, currentRow: 0, currentSection: 0, earthQuakes: self.earthQuakes), let earthQuakes = self.earthQuakes {
             
             self.earthQuakes = earthQuakes.filter({$0 != earthQuake})
             self.earthQuakeTable.reloadData()
@@ -200,13 +224,13 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     /**
     * UITableView delegate method indicating that a row has been selected.
     */
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        if let earthQuake = EarthQuakeViewController.getEarthQuakeForIndexPath(indexPath, currentRow: 0, currentSection: 0, earthQuakes: self.earthQuakes), url = NSURL(string: earthQuake.link) {
+        if let earthQuake = EarthQuakeViewController.getEarthQuakeForIndexPath(indexPath, currentRow: 0, currentSection: 0, earthQuakes: self.earthQuakes), let url = URL(string: earthQuake.link) {
             
-            UIApplication.sharedApplication().openURL(url)
+            UIApplication.shared.open(url)
         }
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     /**
@@ -219,12 +243,12 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     *
     * @return - retrieved earthquake
     */
-    private class func getEarthQuakeForIndexPath(indexPath: NSIndexPath, currentRow: Int, currentSection: Int, earthQuakes: [EarthQuake]?) -> EarthQuake? {
+    private class func getEarthQuakeForIndexPath(_ indexPath: IndexPath, currentRow: Int, currentSection: Int, earthQuakes: [EarthQuake]?) -> EarthQuake? {
         
-        if let earthQuakes = earthQuakes, firstEarthQuake = earthQuakes.first, rowDate = firstEarthQuake.date {
+        if let earthQuakes = earthQuakes, let firstEarthQuake = earthQuakes.first, let rowDate = firstEarthQuake.date {
             
             //base case if sections and rows are equal
-            if indexPath.section == currentSection && indexPath.row == currentRow {
+            if (indexPath as NSIndexPath).section == currentSection && (indexPath as NSIndexPath).row == currentRow {
                 return firstEarthQuake
             }
             
@@ -232,17 +256,17 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
             let tail = Array(earthQuakes.dropFirst())
             
             //advance row
-            if indexPath.section == currentSection {
+            if (indexPath as NSIndexPath).section == currentSection {
                 
                 return getEarthQuakeForIndexPath(indexPath, currentRow: currentRow + 1, currentSection: currentSection, earthQuakes: tail)
             }
             
             //advance section
-            if let firstTail = tail.first, tailDate = firstTail.date {
+            if let firstTail = tail.first, let tailDate = firstTail.date {
                 
                 //get date components of first and second element
-                let rowComponents = EarthQuakeViewController.getDateComponentsForDate(rowDate)
-                let tailComponents = EarthQuakeViewController.getDateComponentsForDate(tailDate)
+                let rowComponents = EarthQuakeViewController.getDateComponentsForDate(rowDate as Date)
+                let tailComponents = EarthQuakeViewController.getDateComponentsForDate(tailDate as Date)
                 
                 //recurse through list looking for date components of given section
                 if tailComponents.month != rowComponents.month || tailComponents.day != rowComponents.day {
@@ -264,18 +288,18 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     *
     * @return count of sections
     */
-    private class func getSectionTotal(currentSection: Int, earthQuakes: [EarthQuake]?, previousComponents: NSDateComponents?) -> Int {
+    private class func getSectionTotal(_ currentSection: Int, earthQuakes: [EarthQuake]?, previousComponents: DateComponents?) -> Int {
         
-        if let earthQuakes = earthQuakes, firstEarthQuake = earthQuakes.first, rowDate = firstEarthQuake.date {
+        if let earthQuakes = earthQuakes, let firstEarthQuake = earthQuakes.first, let rowDate = firstEarthQuake.date {
         
             //get date components of first element
-            let rowComponents = EarthQuakeViewController.getDateComponentsForDate(rowDate)
+            let rowComponents = EarthQuakeViewController.getDateComponentsForDate(rowDate as Date)
 
             //get tail of earthquake list
             let tail = Array(earthQuakes.dropFirst())
-            if let firstTail = tail.first, tailDate = firstTail.date {
+            if let firstTail = tail.first, let tailDate = firstTail.date {
         
-                let tailComponents = EarthQuakeViewController.getDateComponentsForDate(tailDate)
+                let tailComponents = EarthQuakeViewController.getDateComponentsForDate(tailDate as Date)
         
                 //recurse through list looking for date components of given section
                 if tailComponents.month != rowComponents.month || tailComponents.day != rowComponents.day {
@@ -283,7 +307,7 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
                 } else {
                     //acccount for last section of length two
                     if tail.count == 1 && tailComponents.month == rowComponents.month && tailComponents.day == rowComponents.day {
-                        if let previousComponents = previousComponents where tailComponents.month != previousComponents.month || tailComponents.day != previousComponents.day {
+                        if let previousComponents = previousComponents , tailComponents.month != previousComponents.month || tailComponents.day != previousComponents.day {
                             return getSectionTotal(currentSection + 1, earthQuakes: tail, previousComponents: rowComponents)
                         }
                     }
@@ -317,11 +341,11 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     *
     * @return the count of earthquakes at beginning of list that are equal to given date.
     */
-    private class func processRowsForSection(sectionComponents: NSDateComponents, earthQuakes: [EarthQuake]?) -> Int {
+    private class func processRowsForSection(_ sectionComponents: DateComponents, earthQuakes: [EarthQuake]?) -> Int {
         
-        if let earthQuakes = earthQuakes, firstEarthquake = earthQuakes.first, rowDate = firstEarthquake.date {
+        if let earthQuakes = earthQuakes, let firstEarthquake = earthQuakes.first, let rowDate = firstEarthquake.date {
             
-            let rowComponents = EarthQuakeViewController.getDateComponentsForDate(rowDate)
+            let rowComponents = EarthQuakeViewController.getDateComponentsForDate(rowDate as Date)
 
             if rowComponents.month == sectionComponents.month && rowComponents.day == sectionComponents.day {
                 let tail = Array(earthQuakes.dropFirst())
@@ -341,11 +365,11 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     *
     * @return the number of earthquakes for a given day.
     */
-    private class func getNumberOfRowsForDate(sectionComponents: NSDateComponents, earthQuakes:[EarthQuake]?) -> Int {
+    private class func getNumberOfRowsForDate(_ sectionComponents: DateComponents, earthQuakes:[EarthQuake]?) -> Int {
         
-        if let earthQuakes = earthQuakes, firstEarthquake = earthQuakes.first, rowDate = firstEarthquake.date {
+        if let earthQuakes = earthQuakes, let firstEarthquake = earthQuakes.first, let rowDate = firstEarthquake.date {
 
-            let rowComponents = EarthQuakeViewController.getDateComponentsForDate(rowDate)
+            let rowComponents = EarthQuakeViewController.getDateComponentsForDate(rowDate as Date)
 
             let tail = Array(earthQuakes.dropFirst())
             if rowComponents.month == sectionComponents.month && rowComponents.day == sectionComponents.day {
@@ -364,8 +388,8 @@ class EarthQuakeViewController: UIViewController, UITableViewDataSource, UITable
     *
     * @return date components for date
     */
-    private class func getDateComponentsForDate(date: NSDate) -> NSDateComponents {
+    private class func getDateComponentsForDate(_ date: Date) -> DateComponents {
         
-        return NSCalendar.currentCalendar().components([.Day, .Month], fromDate: date)
+        return NSCalendar.current.dateComponents([.day, .month], from: date)
     }
 }
